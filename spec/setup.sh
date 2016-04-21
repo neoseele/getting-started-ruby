@@ -25,6 +25,13 @@ TEST_DIR=$( cd "$(dirname "${BASH_SOURCE}")" ; pwd -P )/../$STEP_NAME
 # copy example settings config to settings.yml
 if [ -f $TEST_DIR/config/settings.example.yml ]; then
   cp $TEST_DIR/config/settings.example.yml $TEST_DIR/config/settings.yml
+  if [ -n "$GOOGLE_CLIENT_ID" ]; then
+    sed -i -e "s/your-client-id/$GOOGLE_CLIENT_ID/g" $TEST_DIR/config/settings.yml
+  fi
+
+  if [ -n "$GOOGLE_CLIENT_SECRET" ]; then
+    sed -i -e "s/your-client-secret/$GOOGLE_CLIENT_SECRET/g" $TEST_DIR/config/settings.yml
+  fi
 fi
 
 # copy example database config to database.yml
@@ -43,6 +50,11 @@ if [ $STEP_NAME = '2-cloud-datastore' ]; then
   # start gcd test server
   gcd-v1beta2-rev1-3.0.2/gcd.sh create -d gcd-test-dataset-directory gcd-test-dataset-directory
   gcd-v1beta2-rev1-3.0.2/gcd.sh start --testing ./gcd-test-dataset-directory/ &
+fi
+
+if [ $STEP_NAME = '4-auth' ]; then
+  # use datastore backend
+  bundle exec rake --rakefile=$TEST_DIR/Rakefile backend:datastore
 fi
 
 if [ $STEP_NAME = '7-compute-engine' ]; then
