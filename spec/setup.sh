@@ -32,6 +32,9 @@ if [ -f $TEST_DIR/config/settings.example.yml ]; then
   if [ -n "$GOOGLE_CLIENT_SECRET" ]; then
     sed -i -e "s/your-client-secret/$GOOGLE_CLIENT_SECRET/g" $TEST_DIR/config/settings.yml
   fi
+  if [ -n "$GOOGLE_PROJECT_ID" ]; then
+    sed -i -e "s/your-project-id/$GOOGLE_PROJECT_ID/g" $TEST_DIR/config/settings.yml
+  fi
 fi
 
 # copy example database config to database.yml
@@ -52,7 +55,7 @@ if [ $STEP_NAME = '2-cloud-datastore' ]; then
   gcd-v1beta2-rev1-3.0.2/gcd.sh start --testing ./gcd-test-dataset-directory/ &
 fi
 
-if [ $STEP_NAME = '4-auth' ]; then
+if [ $STEP_NAME = '4-auth' -o $STEP_NAME = '5-logging' -o $STEP_NAME = '6-task-queueing' ]; then
   # use datastore backend
   pushd $TEST_DIR
   bundle exec rake backend:datastore

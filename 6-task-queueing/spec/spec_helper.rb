@@ -21,6 +21,7 @@ require 'capybara/poltergeist'
 require "rack/test"
 
 database_config = Rails.application.config.database_configuration[Rails.env]
+setupE2EConfig = true
 
 if Book.respond_to? :dataset
   require "datastore_book_extensions"
@@ -45,5 +46,25 @@ RSpec.configure do |config|
     Book.delete_all
     Fog::Mock.reset
     FogStorage.directories.create key: "testbucket", acl: "public-read"
+  end
+
+  config.before(:example, :e2e) do
+    if setupE2EConfig
+      # Set up database.yml for e2e tests with values from environment variables
+      db_file = File.expand_path("../../config/database.yml", __FILE__)
+      db_config = File.read(db_file)
+
+      if ENV["GOOGLE_PROJECT_ID"].nil?
+        raise "Please set environment variable GOOGLE_PROJECT_ID"
+      end
+      project_id = ENV["GOOGLE_PROJECT_ID"]
+
+      find = "#   dataset_id: your-project-id"
+      replace = "  dataset_id: #{project_id}"
+      db_config.sub!(find, replace)
+
+      File.open(db_file, "w") {|file| file.puts db_config }
+      setupE2EConfig = false
+    end
   end
 end
