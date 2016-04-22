@@ -52,11 +52,15 @@ fi
 
 # compile assets if an "assets" directory exists
 if [ -e $TEST_DIR/app/assets ]; then
-  RAILS_ENV=test rake --rakefile=$TEST_DIR/Rakefile assets:precompile
+  pushd $TEST_DIR
+  RAILS_ENV=test bundle exec rake assets:precompile
+  popd
 fi
 
 # run rake DB tasks after all other changes
 if [ -d $TEST_DIR/db/migrate ]; then
   # create the tables required for testing
-  RAILS_ENV=test rake --rakefile=$TEST_DIR/Rakefile db:migrate
+  pushd $TEST_DIR
+  RAILS_ENV=test bundle exec rake db:migrate
+  popd
 fi
