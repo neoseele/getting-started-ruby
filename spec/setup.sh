@@ -54,7 +54,16 @@ fi
 
 if [ $STEP_NAME = '4-auth' ]; then
   # use datastore backend
-  bundle exec rake --rakefile=$TEST_DIR/Rakefile backend:datastore
+  pushd $TEST_DIR
+  bundle exec rake backend:datastore
+  # download gcd testing tool
+  wget -q http://storage.googleapis.com/gcd/tools/gcd-v1beta2-rev1-3.0.2.zip -O gcd-v1beta2-rev1-3.0.2.zip
+  unzip -o gcd-v1beta2-rev1-3.0.2.zip
+
+  # start gcd test server
+  gcd-v1beta2-rev1-3.0.2/gcd.sh create -d gcd-test-dataset-directory gcd-test-dataset-directory
+  gcd-v1beta2-rev1-3.0.2/gcd.sh start --testing ./gcd-test-dataset-directory/ &
+  popd
 fi
 
 if [ $STEP_NAME = '7-compute-engine' ]; then
@@ -64,11 +73,15 @@ fi
 
 # compile assets if an "assets" directory exists
 if [ -e $TEST_DIR/app/assets ]; then
-  RAILS_ENV=test rake --rakefile=$TEST_DIR/Rakefile assets:precompile
+  pushd $TEST_DIR
+  RAILS_ENV=test bundle exec rake assets:precompile
+  popd
 fi
 
 # run rake DB tasks after all other changes
 if [ -d $TEST_DIR/db/migrate ]; then
+  pushd $TEST_DIR
   # create the tables required for testing
-  RAILS_ENV=test rake --rakefile=$TEST_DIR/Rakefile db:migrate
+  RAILS_ENV=test bundle exec rake db:migrate
+  popd
 fi
