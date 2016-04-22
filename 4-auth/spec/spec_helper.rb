@@ -57,7 +57,7 @@ RSpec.configure do |config|
       db_config = File.read(db_file)
 
       if ENV["GOOGLE_PROJECT_ID"].nil?
-        raise "Please set environment variable #{envkey}"
+        raise "Please set environment variable GOOGLE_PROJECT_ID"
       end
       project_id = ENV["GOOGLE_PROJECT_ID"]
 
