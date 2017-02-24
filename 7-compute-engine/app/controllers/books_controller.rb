@@ -11,12 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+require 'socket'
+
 class BooksController < ApplicationController
 
   PER_PAGE = 10
 
   def index
     @books, @more = Book.query limit: PER_PAGE, cursor: params[:more]
+    @hostname = Socket.gethostname
   end
 
   def new

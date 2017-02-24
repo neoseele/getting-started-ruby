@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+require 'socket'
+
 # [START index]
 class BooksController < ApplicationController
 
@@ -21,6 +23,7 @@ class BooksController < ApplicationController
     book_offset = PER_PAGE * (page_number - 1)
     @books      = Book.limit(PER_PAGE).offset(book_offset)
     @next_page  = page_number + 1 if @books.count == PER_PAGE
+    @hostname   = Socket.gethostname
   end
 # [END index]
 
