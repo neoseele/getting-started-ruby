@@ -15,13 +15,15 @@
 
 set -ex
 
-ZONE=us-central1-f
+ZONE=asia-east1-c
+REGION=asia-east1
 
 GROUP=frontend-group
 TEMPLATE=$GROUP-tmpl
-MACHINE_TYPE=f1-micro
-STARTUP_SCRIPT=my-startup.sh
-IMAGE=ubuntu-15-04
+MACHINE_TYPE=g1-small
+STARTUP_SCRIPT=gce/my-startup.sh
+IMAGE_FAMILY=ubuntu-1604-lts
+IMAGE_PROJECT=ubuntu-os-cloud
 SCOPES="userinfo-email,\
 logging-write,\
 storage-full,\
@@ -30,7 +32,7 @@ https://www.googleapis.com/auth/pubsub,\
 https://www.googleapis.com/auth/projecthosting"
 TAGS=http-server
 
-MIN_INSTANCES=1
+MIN_INSTANCES=2
 MAX_INSTANCES=10
 TARGET_UTILIZATION=0.6
 
@@ -49,7 +51,8 @@ gcloud compute instance-templates create $TEMPLATE \
   --machine-type $MACHINE_TYPE \
   --scopes $SCOPES \
   --metadata-from-file startup-script=$STARTUP_SCRIPT \
-  --image $IMAGE \
+  --image-family $IMAGE_FAMILY \
+  --image-project $IMAGE_PROJECT \
   --tags $TAGS
 # [END create_template]
 
@@ -67,7 +70,7 @@ gcloud compute instance-groups managed \
 # [START create_named_port]
 gcloud compute instance-groups managed set-named-ports \
     $GROUP \
-    --named-port http:8080 \
+    --named-ports http:80 \
     --zone $ZONE
 # [END create_named_port]
 
@@ -101,13 +104,15 @@ gcloud compute http-health-checks create ah-health-check \
 
 # [START create_backend_service]
 gcloud compute backend-services create $SERVICE \
-  --http-health-check ah-health-check
+  --global \
+  --http-health-checks ah-health-check
 # [END create_backend-service]
 
 # [START add_backend_service]
 gcloud compute backend-services add-backend $SERVICE \
-  --group $GROUP \
-  --zone $ZONE
+  --global \
+  --instance-group $GROUP \
+  --instance-group-zone $ZONE
 # [END add_backend_service]
 
 # Create a URL map and web Proxy. The URL map will send all requests to the
@@ -129,7 +134,7 @@ gcloud compute target-http-proxies create $SERVICE-proxy \
 gcloud compute forwarding-rules create $SERVICE-http-rule \
   --global \
   --target-http-proxy $SERVICE-proxy \
-  --port-range 80
+  --ports 80
 # [END create_forwarding_rule]
 
 #
@@ -144,9 +149,9 @@ gcloud compute instance-groups managed set-autoscaling \
 # [END set_autoscaling]
 
 # [START create_firewall]
-gcloud compute firewall-rules create default-allow-http-8080 \
-    --allow tcp:8080 \
-    --source-ranges 0.0.0.0/0 \
-    --target-tags http-server \
-    --description "Allow port 8080 access to http-server"
+# gcloud compute firewall-rules create default-allow-http-8080 \
+#     --allow tcp:8080 \
+#     --source-ranges 0.0.0.0/0 \
+#     --target-tags http-server \
+#     --description "Allow port 8080 access to http-server"
 # [END create_firewall]
