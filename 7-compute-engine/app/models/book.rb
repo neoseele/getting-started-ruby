@@ -18,7 +18,7 @@ class Book
   include ActiveModel::Validations
 
   attr_accessor :id, :title, :author, :published_on, :description, :image_url,
-                :cover_image, :creator_id
+                :cover_image, :creator_id, :title_zh, :title_ja
 
   validates :title, presence: true
 
@@ -86,6 +86,8 @@ class Book
     entity["description"]  = description          if description.present?
     entity["image_url"]    = image_url            if image_url.present?
     entity["creator_id"]   = creator_id           if creator_id.present?
+    entity["title_zh"]     = title_zh           if title_zh.present?
+    entity["title_ja"]     = title_ja           if title_ja.present?
     entity
   end
 
@@ -151,6 +153,7 @@ class Book
       unless persisted? # just saved
         self.id = entity.key.id
         lookup_book_details
+        translate_book_title
       end
 
       self.id = entity.key.id
@@ -167,6 +170,10 @@ class Book
     if [author, description, published_on, image_url].any? {|attr| attr.blank? }
       LookupBookDetailsJob.perform_later self
     end
+  end
+  
+  def translate_book_title
+    TranslateBookTitleJob.perform_later self
   end
   # [END enqueue_job]
 end
