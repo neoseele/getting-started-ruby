@@ -34,7 +34,7 @@
   </div>
   <!-- [END cover] -->
   <div class="media-body">
-    <h4><%= @book.title %> | &nbsp; <small><%= @book.published_on %></small></h4>
+    <h4><%= @book.title %> <%= "(#{@book.title_zh})" if @book.title_zh %> <%= "(#{@book.title_ja})" if @book.title_ja %> | &nbsp; <small><%= @book.published_on %></small></h4>
     <h5>By <%= @book.author || "unknown" %></h5>
     <p><%= @book.description %></p>
   </div>

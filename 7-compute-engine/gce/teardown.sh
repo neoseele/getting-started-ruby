@@ -38,4 +38,4 @@ gcloud compute instance-groups managed delete $GROUP
 
 gcloud compute instance-templates delete $TEMPLATE 
 
-# gcloud compute firewall-rules delete default-allow-http-8080
+# gcloud compute firewall-rules delete default-allow-http-80

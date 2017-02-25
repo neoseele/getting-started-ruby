@@ -21,13 +21,13 @@ class TranslateBookTitleJob < ActiveJob::Base
                       "#{book.id} #{book.title.inspect}"
 
     # Create Translate
-    translate = Google::Cloud::Translate.new
+    translate = Google::Cloud::Translate.new keyfile: "/opt/app/api_key.json"
     
-    title_zh = translate.translate(boot.title, to: 'zh', model: "nmt").text.inspect
-    title_ja = translate.translate(boot.title, to: 'ja', model: "nmt").text.inspect
+    title_zh = translate.translate book.title, to: "zh", model: "nmt"
+    title_ja = translate.translate book.title, to: "ja", model: "nmt"
     
-    book.title_zh = title_zh unless title_zh.empty?
-    book.title_ja = title_ja unless title_zh.empty?
+    book.title_zh = title_zh.text
+    book.title_ja = title_ja.text
     book.save
     
     Rails.logger.info "[TranslateService] (#{book.id}) Complete"
