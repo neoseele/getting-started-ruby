@@ -17,8 +17,12 @@ upstream app {
 }
 
 server {
-    listen 80;
+    listen 443 ssl;
     server_name localhost;
+    ssl_certificate /etc/nginx/localhost.crt;
+    ssl_certificate /etc/nginx/localhost.key;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers HIGH:!aNULL:!MD5;
 
     root /opt/app/7-compute-engine/public;
 

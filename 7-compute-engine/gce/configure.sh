@@ -37,6 +37,13 @@ apt-get install -y git ruby ruby-dev build-essential libxml2-dev zlib1g-dev ngin
 
 gem install bundler --no-ri --no-rdoc
 
+# Copy some files out of the bucket
+gsutil cp gs://nmiu-play/files/localhost.crt /etc/nginx/
+gsutil cp gs://nmiu-play/files/localhost.key /etc/nginx/
+gsutil cp gs://nmiu-play/files/key.json /opt/app/
+
+chmod 400 /etc/nginx/localhost.key
+
 useradd -m railsapp
 chown -R railsapp:railsapp /opt/app
 
