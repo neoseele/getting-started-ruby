@@ -30,7 +30,7 @@ storage-full,\
 datastore,\
 https://www.googleapis.com/auth/pubsub,\
 https://www.googleapis.com/auth/projecthosting"
-TAGS=http-server
+TAGS=https-server
 
 MIN_INSTANCES=2
 MAX_INSTANCES=10
@@ -149,9 +149,9 @@ gcloud compute instance-groups managed set-autoscaling \
 # [END set_autoscaling]
 
 # [START create_firewall]
-gcloud compute firewall-rules create default-allow-http-80 \
-    --allow tcp:80 \
-    --source-ranges 0.0.0.0/0 \
-    --target-tags http-server \
-    --description "Allow port 80 access to http-server"
+# gcloud compute firewall-rules create default-allow-http-80 \
+#     --allow tcp:80 \
+#     --source-ranges 0.0.0.0/0 \
+#     --target-tags http-server \
+#     --description "Allow port 80 access to http-server"
 # [END create_firewall]
